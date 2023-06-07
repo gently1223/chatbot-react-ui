@@ -29,7 +29,7 @@ function Chat() {
             };
 
             const res = await axios.post(configData.API_SERVER + "chatbot", requestOptions);
-            console.log(res.data)
+            console.log(res.data, "response")
 
             const message = res.data;
             setAnswer(message);

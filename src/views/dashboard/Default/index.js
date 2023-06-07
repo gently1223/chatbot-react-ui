@@ -37,7 +37,6 @@ const Dashboard = () => {
             try {
             const response = await axios.get(configData.API_SERVER + "dashboard");
             setTableData(response.data);
-            console.log(response.data)
             } catch (error) {
             console.error('Error fetching data:', error);
             }
@@ -53,8 +52,26 @@ const Dashboard = () => {
 
     const handleSaveRowEdits = async ({ exitEditingMode, row, values }) => {
         if (!Object.keys(validationErrors).length) {
+            console.log(values)
             tableData[row.index] = values;
-            //send/receive api updates here, then refetch or update local table data for re-render
+            // TODO: edit api to backend
+            const data = {
+                "user_id": values.id,
+                "username": values.username,
+                "email": values.email,
+                // "role": values.role,
+            }
+
+            console.log(data, "row_value")
+
+            const requestOptions = {
+                method: "POST",
+                header: { "Content-Type": "application/json" },
+                body: JSON.stringify({ data }),
+            };
+
+            const res = await axios.post(configData.API_SERVER + "users/edit", requestOptions);
+
             setTableData([...tableData]);
             exitEditingMode(); //required to exit editing mode and close modal
         }
@@ -71,9 +88,20 @@ const Dashboard = () => {
             ) {
             return;
             }
+            // TODO: delete api 
+            console.log(row.index, "row.index");
+            console.log(tableData[row.index].id, "table_value");
+            let _user_id = tableData[row.index].id
             //send api delete request here, then refetch or update local table data for re-render
-            tableData.splice(row.index, 1);
-            setTableData([...tableData]);
+            axios.delete(configData.API_SERVER + `users/delete/${_user_id}`)
+                .then(() => {
+                    console.log("confirm delete request here")
+                    tableData.splice(row.index, 1);
+                    setTableData([...tableData]);
+                })
+                .catch((error) => {
+                    console.log(error)
+                });
         },
         [tableData],
     );
@@ -163,8 +191,8 @@ const Dashboard = () => {
                     enableColumnOrdering
                     enableEditing
                     onEditingRowSave={handleSaveRowEdits}
-                    onEditingRowCancel={handleCancelRowEdits}
-                    renderRowActions={({ row, table }) => (
+                    onEditingRowCancel={handleCancelRowEdits}                                           
+                    renderRowActions={({ cell, row, table }) => (
                         <Box sx={{ display: 'flex', gap: '1rem' }}>
                             <Tooltip arrow placement="left" title="Edit">
                             <IconButton onClick={() => table.setEditingRow(row)}>
@@ -172,21 +200,24 @@ const Dashboard = () => {
                             </IconButton>
                             </Tooltip>
                             <Tooltip arrow placement="right" title="Delete">
-                            <IconButton color="error" onClick={() => handleDeleteRow(row)}>
+                            <IconButton color="error" onClick={() => 
+                                handleDeleteRow(row)
+                                // console.log(row, 'row')
+                                }>
                                 <Delete />
                             </IconButton>
                             </Tooltip>
                         </Box>
                     )}
-                    renderTopToolbarCustomActions={() => (
-                        <Button
-                            color="secondary"
-                            onClick={() => setCreateModalOpen(true)}
-                            variant="contained"
-                        >
-                            Create New Account
-                        </Button>
-                    )}
+                    // renderTopToolbarCustomActions={() => (
+                    //     <Button
+                    //         color="secondary"
+                    //         onClick={() => setCreateModalOpen(true)}
+                    //         variant="contained"
+                    //     >
+                    //         Create New Account
+                    //     </Button>
+                    // )}
                 />
                 <CreateNewAccountModal
                     columns={columns}

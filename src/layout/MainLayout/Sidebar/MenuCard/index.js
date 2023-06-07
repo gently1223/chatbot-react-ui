@@ -62,11 +62,11 @@ const UpgradePlanCard = () => {
         <Card className={classes.card}>
             <CardContent>
                 <Grid container direction="column" spacing={2}>
-                    {/* <Grid item>
+                    <Grid item>
                         <Typography variant="h4">
                             React Flask API Berry
                         </Typography>
-                    </Grid> */}
+                    </Grid>
                     <Grid item>
                         <Typography variant="subtitle2" className={classes.tagLine}>
                             Open-source full-stack seed project.
